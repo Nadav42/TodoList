@@ -1,0 +1,12 @@
+.box {
+    min-height: 100px;
+    background-color: red;
+
+    margin: 8px 0px;
+}
+
+@media only screen and (max-width: 600px) {
+    .box {
+        width: 100%;
+    }
+}

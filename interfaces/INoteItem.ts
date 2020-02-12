@@ -3,3 +3,8 @@ export interface INoteItem {
     name: string;
     checked: boolean;
 }
+
+export interface IModifyItemForm {
+    name: string;
+    checked: boolean;
+}

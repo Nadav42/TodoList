@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 
 const ItemSchema = new mongoose.Schema(
     {
-        name: String,
-        checked: Boolean
+        name: {type: String, required: true},
+        checked: { type: Boolean, default: false }
     },
     { timestamps: true },
 );

@@ -11,6 +11,7 @@ export default (app: Router) => {
 
 		if (!body.name) {
 			res.send({ errorMsg: "notes must have a name" });
+			return;
 		}
 
 		const note = await notesService.createNote(body.name);
@@ -29,10 +30,12 @@ export default (app: Router) => {
 		const body = req.body;
 
 		if (!params.noteId) {
-			res.send({ errorMsg: "must provide an id to remove note" });
+			res.send({ errorMsg: "must provide an id to modify note" });
+			return;
 		}
 		else if (!body.name) {
 			res.send({ errorMsg: "must provide a name for the change" });
+			return;
 		}
 
 		const note = await notesService.modifyNote(params.noteId, body.name);
@@ -45,6 +48,7 @@ export default (app: Router) => {
 
 		if (!params.noteId) {
 			res.send({ errorMsg: "must provide an id to remove note" });
+			return;
 		}
 
 		const removedNote = await notesService.removeNote(params.noteId);

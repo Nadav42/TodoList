@@ -10,6 +10,10 @@ import NoteCreateButton from './components/notes/NoteCreateButton'
 
 @observer
 class App extends React.Component<TodoStoreProps> {
+    componentDidMount() {
+        this.props.todoStore.fetchNotes(); // load notes on startup
+    }
+
     renderNotes() {
         return this.props.todoStore.notes.map(note => <NoteDisplay key={note.id} note={note} />)
     }

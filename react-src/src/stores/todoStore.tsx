@@ -37,15 +37,20 @@ class TodoItem {
 class Note {
     @observable id: string;
     @observable name: string;
-    @observable items: TodoItem[] = [];
+    @observable private itemsJsonArray: ITodoItem[] = []; // array of json objects, use computed property "items" for actions
     removeNoteById: CallableFunction;
+
+    // create instances with observable for each todo item
+    @computed get items(): TodoItem[] {
+        return this.itemsJsonArray.map(item => new TodoItem(this.id, item, this.removeTodoItemById));
+    }
 
     constructor(noteData: INote, removeNoteById: CallableFunction) {
         this.id = noteData._id
         this.name = noteData.name;
 
         // create instance with observable each todo item
-        this.updateTodoItems(noteData);
+        this.itemsJsonArray = noteData.items;
 
         // function for removing note by id
         this.removeNoteById = removeNoteById;
@@ -54,38 +59,28 @@ class Note {
     @action
     fetchNoteData = async () => {
         const noteData = await getNoteById(this.id);
+
         runInAction(() => {
             this.name = noteData.name;
-            this.items = []
-
-            // create instance with observable each todo item
-            this.updateTodoItems(noteData);
+            this.itemsJsonArray = noteData.items;
         })
     }
 
     @action
-    updateTodoItems(note: INote) {
-        this.items = [];
-
-        note.items.forEach(item => {
-            this.items.push(new TodoItem(this.id, item, this.removeTodoItemById))
-        });
-    }
-
-    @action
     addItem = (name: string) => {
-        // block empty string
+        // return if empty string
         if (!name || name.trim().length == 0) {
             return
         }
 
+        // create new todo item in this note
         postCreateTodoItem(this.id, name, (itemData: ITodoItem) => {
             if (!itemData || !itemData._id) {
                 return;
             }
 
             // create was done successfully
-            this.items.push(new TodoItem(this.id, itemData, this.removeTodoItemById));
+            this.itemsJsonArray.push(itemData);
         });
     }
 
@@ -94,14 +89,14 @@ class Note {
         this.removeNoteById(this.id);
     }
 
-    @action // remove child
+    @action // remove child (todo item)
     removeTodoItemById = async (itemId: string) => {
         const noteData: INote = await deleteTodoItem(this.id, itemId);
 
         // if note to delete was found and delete success
         if (noteData._id && noteData.items) {
             runInAction(() => {
-                this.updateTodoItems(noteData);
+                this.itemsJsonArray = noteData.items;
             });
         }
     }
@@ -109,15 +104,11 @@ class Note {
 
 // list of all notes
 class TodoStore {
-    @observable notes: Note[] = [];
-    @observable num = 1;
+    @observable notesJsonArray: INote[] = [];
 
-    @computed get mult() {
-        return this.num * 2;
-    }
-
-    constructor() {
-        this.fetchNotes();
+    // create instances with observable for each todo item
+    @computed get notes(): Note[] {
+        return this.notesJsonArray.map(note => new Note(note, this.removeNoteById));
     }
 
     @action
@@ -125,13 +116,7 @@ class TodoStore {
         const notesData = await getNotesData();
 
         runInAction(() => {
-            if (notesData) {
-                this.notes = [];
-            }
-
-            notesData.results.forEach(note => {
-                this.updateNoteData(note);
-            })
+            this.notesJsonArray = notesData.results;
         })
     }
 
@@ -143,13 +128,8 @@ class TodoStore {
             }
 
             // create was done successfully
-            this.updateNoteData(noteData);
+            this.notesJsonArray.push(noteData);
         });
-    }
-
-    @action
-    updateNoteData(noteDetails: INote) {
-        this.notes.push(new Note(noteDetails, this.removeNoteById));
     }
 
     @action
@@ -165,6 +145,7 @@ class TodoStore {
     }
 }
 
+// interfaces for react prop types
 export interface TodoStoreProps {
     todoStore: TodoStore;
 }
@@ -177,6 +158,7 @@ export interface TodoItemProps {
     item: TodoItem;
 }
 
+// the store
 const todoStore = new TodoStore();
 
 export default todoStore;

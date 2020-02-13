@@ -4,9 +4,10 @@ import { observer } from 'mobx-react'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import todoStore, { TodoStoreProps } from './stores/todoStore'
-import NoteDisplay from './components/notes/NoteDisplay'
-import NoteCreateButton from './components/notes/NoteCreateButton'
+import { TodoStoreProps } from './stores/todoStore'
+import NotesList from './components/notes/NotesList'
+
+import './css/main.css';
 
 @observer
 class App extends React.Component<TodoStoreProps> {
@@ -14,15 +15,10 @@ class App extends React.Component<TodoStoreProps> {
         this.props.todoStore.fetchNotes(); // load notes on startup
     }
 
-    renderNotes() {
-        return this.props.todoStore.notes.map(note => <NoteDisplay key={note.id} note={note} />)
-    }
-
     render() {
         return (
-            <div className="container my-2 mx-auto">
-                {this.renderNotes()}
-                <NoteCreateButton todoStore={this.props.todoStore} />
+            <div className="container my-5">
+                <NotesList todoStore={this.props.todoStore} />
                 <ToastContainer />
             </div>
         )

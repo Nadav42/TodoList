@@ -117,6 +117,15 @@ export const postCreateNote = (name: String, callback: CallableFunction) => {
     post("/api/notes/create", body, null, callback);
 }
 
+// patch modify note (name)
+export const patchModifyNote = (noteId: string, name: string, callback: CallableFunction) => {
+    let body = {
+        name: name,
+    };
+
+    patch(`/api/notes/${noteId}`, body, null, callback);
+}
+
 // remove todo list
 export const deleteNote = async (todoId: string): Promise<INote> => {
     return await httpDelete(`/api/notes/${todoId}`);

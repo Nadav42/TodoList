@@ -1,5 +1,5 @@
 import { observable, computed, action, runInAction } from 'mobx';
-import { getNotesData, getNoteById, postCreateNote, deleteNote, patchModifyItem, postCreateTodoItem, deleteTodoItem } from '../api/todoApi';
+import { getNotesData, getNoteById, postCreateNote, patchModifyNote, deleteNote, patchModifyItem, postCreateTodoItem, deleteTodoItem } from '../api/todoApi';
 import { INote, ITodoItem } from '../api/interfaces'; // endpoint return type structures
 
 // single todo item
@@ -37,6 +37,8 @@ class TodoItem {
 class Note {
     @observable id: string;
     @observable name: string;
+    @observable createdAt: Date;
+    @observable updatedAt: Date;
     @observable private itemsJsonArray: ITodoItem[] = []; // array of json objects, use computed property "items" for actions
     removeNoteById: CallableFunction;
 
@@ -48,6 +50,8 @@ class Note {
     constructor(noteData: INote, removeNoteById: CallableFunction) {
         this.id = noteData._id
         this.name = noteData.name;
+        this.createdAt = noteData.createdAt;
+        this.updatedAt = noteData.updatedAt;
 
         // create instance with observable each todo item
         this.itemsJsonArray = noteData.items;
@@ -81,6 +85,13 @@ class Note {
 
             // create was done successfully
             this.itemsJsonArray.push(itemData);
+        });
+    }
+
+    @action
+    changeName = (newName: string) => {
+        patchModifyNote(this.id, newName, (data: INote) => {
+            this.name = data.name;
         });
     }
 

@@ -19,6 +19,7 @@ class FocusedInput extends React.Component<propTypes> {
     componentDidMount() {
         if (this.textInput) {
             this.textInput.focus();
+            this.textInput.select();
         }
     }
 

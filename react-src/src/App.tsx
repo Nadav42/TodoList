@@ -17,13 +17,6 @@ class App extends React.Component<TodoStoreProps> {
         return (
             <div className="container my-2 mx-auto">
                 {this.renderNotes()}
-
-                <div className="text-center">
-                    <p>Current value: {this.props.todoStore.num}</p>
-                    <p>Calculated value: {this.props.todoStore.mult}</p>
-                    <button onClick={this.props.todoStore.increaseNum}>Increase number</button>
-                </div>
-                
                 <ToastContainer />
             </div>
         )

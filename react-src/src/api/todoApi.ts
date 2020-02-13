@@ -83,6 +83,19 @@ const patch = async (endpointUrl: String, bodyData: Object, successMsg: any, cal
         });
 }
 
+// DELETE REQUEST Helper
+const httpDelete = async (endpointUrl: String) => {
+    try {
+        const response = await api.delete(`${url}${endpointUrl}`);
+        return response.data;
+    }
+    catch (error) {
+        console.log(error);
+    }
+
+    return null;
+}
+
 // ---------- api ---------- //
 
 // get all notes data
@@ -109,6 +122,10 @@ export const patchModifyItem = (noteId: string, itemId: string, name:string, che
     patch(`/api/items/${noteId}/${itemId}`, body, null, callback);
 }
 
+// remove todo list
+export const deleteTodoList = async (todoId: string): Promise<INote> => {
+    return await httpDelete(`/api/notes/${todoId}`);
+}
 
 
 export default api;

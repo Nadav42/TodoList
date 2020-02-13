@@ -11,7 +11,7 @@ const NoteDisplay = observer((props: NoteProps) => {
 
     return (
         <div>
-            <h3>{note.name}</h3>
+            <div><h3 className="d-inline">{note.name}</h3> <span className="text-muted" onClick={note.remove}>(remove)</span></div>
             <ul>
                 {todos}
             </ul>

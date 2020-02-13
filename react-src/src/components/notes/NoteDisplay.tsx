@@ -1,9 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react'
+import { FaEdit, FaTrash } from 'react-icons/fa'
 
 import TodoItemDisplay from '../todo/TodoItemDisplay'
-
 import { NoteProps } from '../../stores/todoStore'
+import FocusedInput from './FocusedInput'
 
 @observer
 class NoteDisplay extends React.Component<NoteProps, { editable: boolean, editableName: string, newItemValue: string }> {
@@ -20,6 +21,13 @@ class NoteDisplay extends React.Component<NoteProps, { editable: boolean, editab
         this.setState({ editable: !this.state.editable, editableName: editableName });
     }
 
+    handleRemoveNote = () => {
+        const confirmResult = window.confirm("This action can not be restored, delete note?");
+        if (confirmResult) {
+            this.props.note.remove();
+        }
+    }
+
     handleNewItemValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ newItemValue: e.target.value });
     }
@@ -28,13 +36,17 @@ class NoteDisplay extends React.Component<NoteProps, { editable: boolean, editab
         this.setState({ editableName: e.target.value });
     }
 
+    // submit list name change
     handleChangeName = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
 
         this.setState({ editable: false });
         this.props.note.changeName(this.state.editableName);
     }
 
+    // submit new todo item
     handleCreateNewItem = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -42,38 +54,46 @@ class NoteDisplay extends React.Component<NoteProps, { editable: boolean, editab
         this.setState({ newItemValue: "" }); // reset form
     }
 
+    // editable title
     renderTitle() {
         if (!this.state.editable) {
-            return <h3 className="d-inline">{this.props.note.name}</h3>
+            return <h3 className="d-inline overflow-text pl-1" onClick={this.handleEditToggle}>{this.props.note.name}</h3>
         }
 
         // editable input
         return (
             <form onSubmit={this.handleChangeName}>
-                <input type="text" value={this.state.editableName} onChange={this.handleEditableNameChange} />
+                <FocusedInput value={this.state.editableName} onChange={this.handleEditableNameChange} onBlur={this.handleChangeName} />
             </form>
         );
     }
 
     render() {
-        const note = this.props.note;
         const todos = this.props.note.items.map(item => <TodoItemDisplay key={item.id} item={item} />)
 
         return (
-            <div className="mb-4">
-                <div>
-                    {this.renderTitle()}
-                    <span className="text-muted" onClick={note.remove}>(remove)</span>
-                    <span className="text-muted" onClick={this.handleEditToggle}>(edit)</span>
-                </div>
-                <ul>
-                    {todos}
-                </ul>
-                <div>
-                    <form onSubmit={this.handleCreateNewItem}>
-                        <input type="text" value={this.state.newItemValue} onChange={this.handleNewItemValueChange} />
-                        <button type="submit">Add</button>
-                    </form>
+            <div className="col-12 col-md-6 col-lg-3">
+                <div className="todo-list-container mx-auto border">
+                    <div className="row">
+                        <div className="col-8">
+                            {this.renderTitle()}
+                        </div>
+                        <div className="col-4 text-right">
+                            <span className="title-icon text-muted" onClick={this.handleEditToggle}><FaEdit /></span>
+                            <span className="title-icon text-muted" onClick={this.handleRemoveNote}><FaTrash /></span>
+                        </div>
+                    </div>
+                    <hr></hr>
+                    <div className="todo-list">
+                        {todos}
+                    </div>
+                    <div>
+                        <form onSubmit={this.handleCreateNewItem}>
+                            <div className="input-group">
+                                <input type="text" className="item-text-input" value={this.state.newItemValue} onChange={this.handleNewItemValueChange} placeholder="Add task" />
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         );

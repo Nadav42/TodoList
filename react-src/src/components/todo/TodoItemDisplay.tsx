@@ -2,16 +2,27 @@ import React from 'react';
 import { observer } from 'mobx-react'
 
 import { TodoItemProps } from '../../stores/todoStore'
+import CircleCheckbox from './CircleCheckbox'
+
+import { IoIosRemoveCircleOutline } from 'react-icons/io'
 
 const TodoItemDisplay = observer((props: TodoItemProps) => {
     const item = props.item;
+    let checkedClass = "";
+
+    if (item.checked) {
+        checkedClass = "checked";
+    }
 
     return (
-        <li>
-            <input type="checkbox" checked={item.checked} onChange={item.toggleChecked} />
-            <span className="px-1">{item.name}</span>
-            <span className="text-danger" onClick={item.remove}>x</span>
-        </li>
+        <div className="todo-item">
+            <div className="checkbox-container">
+                <CircleCheckbox checked={item.checked} onChange={item.toggleChecked} />
+            </div>
+
+            <div className={`todo-content ${checkedClass}`}>{item.name}</div>
+            <div className="todo-remove" onClick={item.remove}><IoIosRemoveCircleOutline /></div>
+        </div>
     );
 });
 

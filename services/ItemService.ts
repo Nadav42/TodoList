@@ -47,12 +47,13 @@ class ItemService {
                 itemToModify.name = modifyForm.name;
             }
 
-            if (modifyForm.checked) {
+            if (modifyForm.checked !== undefined) {
                 itemToModify.checked = modifyForm.checked;
             }
 
             // save note changes to db and return the updated document
-            return await noteRecord.save();
+            await noteRecord.save();
+            return itemToModify;
         } catch (error) {
             return {errorMsg: "can't add item to that note"}
         }

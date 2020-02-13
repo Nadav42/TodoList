@@ -39,7 +39,7 @@ export default (app: Router) => {
 		}
 
 		const note = await notesService.modifyNote(params.noteId, body.name);
-		res.send({ note });
+		res.send(note);
 	})
 
 	// remove a note
@@ -52,6 +52,6 @@ export default (app: Router) => {
 		}
 
 		const removedNote = await notesService.removeNote(params.noteId);
-		res.send({ removedNote });
+		res.send(removedNote);
 	})
 }

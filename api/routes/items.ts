@@ -42,7 +42,7 @@ export default (app: Router) => {
 		}
 
 		const note = await itemService.modifyItem(noteId, itemId, IModifyItemForm);
-		res.send({ note });
+		res.send(note);
 	})
 
 	// remove item from a note
@@ -58,6 +58,6 @@ export default (app: Router) => {
 		}
 
 		const updatedNote = await itemService.removeItem(noteId, itemId);
-		res.send({ updatedNote });
+		res.send(updatedNote);
 	})
 }

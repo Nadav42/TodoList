@@ -18,12 +18,10 @@ class TodoItem {
 
     @action
     toggleChecked = () => {
-        this.checked = !this.checked;
-        console.log(this);
-        // patchModifyItem(this.noteId, this.id, this.name, !this.checked, (data: ITodoItem) => {
-        //     console.log("patchModifyItem data", data)
-        //     this.checked = data.checked;
-        // });
+        patchModifyItem(this.noteId, this.id, this.name, !this.checked, (data: ITodoItem) => {
+            console.log("patchModifyItem data", data)
+            this.checked = data.checked;
+        });
     }
 }
 

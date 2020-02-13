@@ -1,12 +1,14 @@
 import React from 'react';
+import { observer } from 'mobx-react'
+
 import { TodoItemProps } from '../../stores/todoStore'
 
-function TodoItemDisplay(props: TodoItemProps) {
+const TodoItemDisplay = observer((props: TodoItemProps) => {
     const item = props.item;
 
     return (
-        <li><input type="checkbox" checked={item.checked} onChange={item.toggleChecked}/>{item.name}</li>
+        <li><input type="checkbox" checked={item.checked} onChange={item.toggleChecked} />{item.name}</li>
     );
-}
+});
 
 export default TodoItemDisplay;

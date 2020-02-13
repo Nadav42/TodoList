@@ -24,6 +24,20 @@ export default (app: Router) => {
 		res.send({ results: data });
 	})
 
+	// get single note by id
+	app.get('/notes/:noteId', async (req, res) => {
+		const params = req.params;
+		const noteId = params.noteId;
+
+		if (!noteId) {
+			res.send({ errorMsg: "must provide note id" });
+			return;
+		}
+
+		const data = await notesService.getById(noteId);
+		res.send(data);
+	})
+
 	// update note details (name)
 	app.patch('/notes/:noteId', async (req, res) => {
 		const params = req.params;

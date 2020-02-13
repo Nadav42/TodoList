@@ -10,18 +10,18 @@ class ItemService {
             let noteRecord = await NotesModel.findById(noteId);
 
             if (!noteRecord) {
-                return {errorMsg: "note does not exist"}
+                return { errorMsg: "note does not exist" }
             }
-            
+
             // add the item to the items list (items are nested in notes)
-            const item = new ItemModel({name: itemName})
+            const item = new ItemModel({ name: itemName })
             noteRecord.items.push(item)
 
             // save changes to db and return the updated document
             await noteRecord.save();
             return item;
         } catch (error) {
-            return {errorMsg: "can't add item to that note"}
+            return { errorMsg: "can't add item to that note" }
         }
     }
 
@@ -32,14 +32,14 @@ class ItemService {
             let noteRecord = await NotesModel.findById(noteId);
 
             if (!noteRecord) {
-                return {errorMsg: "note does not exist"}
+                return { errorMsg: "note does not exist" }
             }
-            
+
             // find item record inside items list (items are nested in notes)
             const itemToModify = noteRecord.items.find(itemRecord => itemRecord._id == itemId);
 
             if (!itemToModify) {
-                return {errorMsg: "item does not exist"}
+                return { errorMsg: "item does not exist" }
             }
 
             // change the item's details (patch so only change what was sent)
@@ -55,7 +55,7 @@ class ItemService {
             await noteRecord.save();
             return itemToModify;
         } catch (error) {
-            return {errorMsg: "can't add item to that note"}
+            return { errorMsg: "can't add item to that note" }
         }
     }
 
@@ -66,19 +66,24 @@ class ItemService {
             let noteRecord = await NotesModel.findById(noteId);
 
             if (!noteRecord) {
-                return {errorMsg: "note does not exist"}
+                return { errorMsg: "note does not exist" }
             }
-            
+
             // remove the item from the items list (items are nested in notes)
-            noteRecord.items.pull(({ _id: itemId }));
+            const currentItemsCount = noteRecord.items.length
+            const items = noteRecord.items.pull(({ _id: itemId }));
+
+            // if (!currentItemsCount || items.length === currentItemsCount) {
+            //     return { errorMsg: "item not found" }
+            // }
 
             // save changes and return the updated document
             return await noteRecord.save();
         } catch (error) {
-            return {errorMsg: "invalid item to remove"}
+            return { errorMsg: "invalid item to remove" }
         }
     }
-    
+
 }
 
 export default ItemService;

@@ -103,6 +103,11 @@ export const getNotesData = async (): Promise<{ results: [INote] }> => {
     return await get("/api/notes/fetch");
 }
 
+// get single note by id
+export const getNoteById = async (noteId: string): Promise<INote> => {
+    return await get(`/api/notes/${noteId}`);
+}
+
 // post create note
 export const postCreateNote = (name: String, callback: CallableFunction) => {
     let body = {
@@ -112,8 +117,25 @@ export const postCreateNote = (name: String, callback: CallableFunction) => {
     post("/api/notes/create", body, null, callback);
 }
 
+// remove todo list
+export const deleteNote = async (todoId: string): Promise<INote> => {
+    return await httpDelete(`/api/notes/${todoId}`);
+}
+
+// items
+
+// post create todo item
+export const postCreateTodoItem = (noteId: string, name: String, callback: CallableFunction) => {
+    let body = {
+        noteId: noteId,
+        itemName: name
+    };
+
+    post("/api/items/add", body, null, callback);
+}
+
 // patch modify item
-export const patchModifyItem = (noteId: string, itemId: string, name:string, checked: boolean, callback: CallableFunction) => {
+export const patchModifyItem = (noteId: string, itemId: string, name: string, checked: boolean, callback: CallableFunction) => {
     let body = {
         name: name,
         checked: checked
@@ -122,9 +144,9 @@ export const patchModifyItem = (noteId: string, itemId: string, name:string, che
     patch(`/api/items/${noteId}/${itemId}`, body, null, callback);
 }
 
-// remove todo list
-export const deleteTodoList = async (todoId: string): Promise<INote> => {
-    return await httpDelete(`/api/notes/${todoId}`);
+// remove todo item
+export const deleteTodoItem = async (noteId: string, todoId: string): Promise<INote> => {
+    return await httpDelete(`/api/items/${noteId}/${todoId}`);
 }
 
 

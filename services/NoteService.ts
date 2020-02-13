@@ -21,6 +21,12 @@ class NotesService {
         return notes;
     }
 
+    // find all notes
+    async getById(noteId: string) {
+        const note = await NotesModel.findById(noteId);
+        return note;
+    }
+
     // update note details 
     async modifyNote(id: string, name: string) {
         try {

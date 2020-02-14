@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-import { INote, ITodoItem } from './interfaces'
+import { INote } from './interfaces'
 
 let browserCurrentUrl = window.location.href;
 browserCurrentUrl = browserCurrentUrl.split("/")[2];

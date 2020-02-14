@@ -43,7 +43,10 @@ class NoteDisplay extends React.Component<NoteProps, { editable: boolean, editab
         }
 
         this.setState({ editable: false });
-        this.props.note.changeName(this.state.editableName);
+
+        if (this.state.editableName && this.state.editableName.trim().length > 0) {
+            this.props.note.changeName(this.state.editableName);
+        }
     }
 
     // submit new todo item
@@ -57,7 +60,7 @@ class NoteDisplay extends React.Component<NoteProps, { editable: boolean, editab
     // editable title
     renderTitle() {
         if (!this.state.editable) {
-            return <h3 className="d-inline overflow-text pl-1" onClick={this.handleEditToggle}>{this.props.note.name}</h3>
+            return <div className="note-title" onClick={this.handleEditToggle}>{this.props.note.name}</div>;
         }
 
         // editable input

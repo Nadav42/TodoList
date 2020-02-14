@@ -73,7 +73,7 @@ class Note {
     @action
     addItem = (name: string) => {
         // return if empty string
-        if (!name || name.trim().length == 0) {
+        if (!name || name.trim().length === 0) {
             return
         }
 
@@ -148,7 +148,7 @@ class TodoStore {
         const data = await deleteNote(id);
 
         // if note to delete was found and delete success
-        if (data._id && data._id == id) {
+        if (data._id && data._id === id) {
             runInAction(() => {
                 this.fetchNotes();
             });

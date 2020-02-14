@@ -20,6 +20,18 @@
     font-size: 20px;
 }
 
+.note-title {
+    width: 100%;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.2;
+    padding-left: .25rem!important;
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .title-icon {
     font-size: 20px;
     padding: 0px 4px;
@@ -68,8 +80,17 @@
     background-color: #ffcb0cbb;
 }
 
+.circle-checkbox .checkmark {
+    font-size: 16px;
+    position: absolute;
+    top: -5px;
+    left: 1px;
+    color: #ffffff;
+}
+
 .todo-content.checked {
     text-decoration: line-through;
+    color: #7e8286;
 }
 
 .todo-remove {
@@ -77,11 +98,17 @@
     right: 0px;
     top: -4px;
 
+    color: #f06060;
     cursor: pointer;
+    display: none;
+}
+
+.todo-item:hover .todo-remove {
+    display: block;
 }
 
 .todo-remove:hover {
-   color: red;
+    color: #f02020;
 }
 
 .item-text-input {

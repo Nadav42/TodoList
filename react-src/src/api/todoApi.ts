@@ -7,9 +7,7 @@ let browserCurrentUrl = window.location.href;
 browserCurrentUrl = browserCurrentUrl.split("/")[2];
 
 let host = browserCurrentUrl.split(":")[0];
-// let port: number = parseInt(browserCurrentUrl.split(":")[1]);
-
-const port = 3000;
+const port: number = parseInt(browserCurrentUrl.split(":")[1]);
 
 let apiUrl = `http://${host}:${port}`
 console.log(host, apiUrl)

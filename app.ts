@@ -1,4 +1,6 @@
 const express = require('express')
+const path = require('path');
+
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './api';
@@ -6,7 +8,7 @@ import config from './config';
 
 // mongodb connection
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/notesDB', { useNewUrlParser: true });
+mongoose.connect(config.databaseURL, { useNewUrlParser: true });
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -27,5 +29,11 @@ app.use(bodyParser.json());
 // api routes
 app.use(config.api.prefix, routes());
 
-app.listen(config.port, () => console.log(`Example app listening on port ${config.port}!`))
+// serve react build
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, 'react-src/build', 'index.html'));
+});
 
+app.use(express.static(path.join(__dirname, 'react-src/build'))); // serve static react files
+
+app.listen(config.port || 8080, () => console.log(`Example app listening on port ${config.port}!`))

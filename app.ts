@@ -1,7 +1,7 @@
 const express = require('express')
 const path = require('path');
+const bodyParser = require('body-parser')
 
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './api';
 import config from './config';

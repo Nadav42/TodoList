@@ -10,6 +10,11 @@ let host = browserCurrentUrl.split(":")[0];
 const port: number = parseInt(browserCurrentUrl.split(":")[1]);
 
 let apiUrl = `http://${host}:${port}`
+
+if (isNaN(port)) {
+    apiUrl = `http://${host}`
+}
+
 console.log(host, apiUrl)
 
 export let url = apiUrl;

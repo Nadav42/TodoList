@@ -4,15 +4,16 @@ import { toast } from 'react-toastify';
 import { INote } from './interfaces'
 
 let browserCurrentUrl = window.location.href;
+const http_method = browserCurrentUrl.split("://")[0];
 browserCurrentUrl = browserCurrentUrl.split("/")[2];
 
 let host = browserCurrentUrl.split(":")[0];
 const port: number = parseInt(browserCurrentUrl.split(":")[1]);
 
-let apiUrl = `http://${host}:${port}`
+let apiUrl = `${http_method}://${host}`;
 
-if (isNaN(port)) {
-    apiUrl = `http://${host}`
+if (!isNaN(port)) {
+    apiUrl = `${http_method}://${host}:3000`;
 }
 
 console.log(host, apiUrl)

@@ -68,16 +68,18 @@
     cursor: pointer;
 }
 
-.circle-checkbox:hover {
-    background-color: #ffcb0cbb;
+@media only screen and (min-width: 750px) {
+    .circle-checkbox:hover {
+        background-color: #ffcb0cbb;
+    }
+
+    .circle-checkbox.checked:hover {
+        background-color: #ffcb0cbb;
+    }
 }
 
 .circle-checkbox.checked {
     background-color: #ffcb0c;
-}
-
-.circle-checkbox.checked:hover {
-    background-color: #ffcb0cbb;
 }
 
 .circle-checkbox .checkmark {
@@ -100,15 +102,20 @@
 
     color: #f06060;
     cursor: pointer;
-    display: none;
 }
 
-.todo-item:hover .todo-remove {
-    display: block;
-}
+@media only screen and (min-width: 750px) {
+    .todo-remove {
+        display: none;
+    }
 
-.todo-remove:hover {
-    color: #f02020;
+    .todo-item:hover .todo-remove {
+        display: block;
+    }
+    
+    .todo-remove:hover {
+        color: #f02020;
+    }
 }
 
 .item-text-input {

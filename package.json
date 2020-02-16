@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.ts",
   "scripts": {
+    "start": "ts-node app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,17 +19,21 @@
   "homepage": "https://github.com/Nadav42/TodoList#readme",
   "dependencies": {
     "@types/mongoose": "^5.7.1",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongoose": "^5.8.11"
+    "mongoose": "^5.8.11",
+	"typescript": "^3.7.5",
+	"ts-node": "^8.6.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.2",
     "@types/node": "^13.7.1",
     "nodemon": "^2.0.2",
-    "ts-node": "^8.6.2",
-    "tslint": "^6.0.0",
-    "typescript": "^3.7.5"
+    "tslint": "^6.0.0"
+  },
+  "engines": {
+    "node": "13.7.0"
   }
 }

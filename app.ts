@@ -38,3 +38,8 @@ app.get('/', function (req, res) {
 app.use(express.static(path.join(__dirname, 'react-src/build')));
 
 app.listen(config.port || 8080, () => console.log(`Example app listening on port ${config.port}!`))
+
+// hack to keep heroku dyno awake
+const wakeDyno = require("./wakeDyno"); 
+const DYNO_URL = "https://todo-app-nadav.herokuapp.com/"; // url of heroku dyno
+wakeDyno(DYNO_URL);

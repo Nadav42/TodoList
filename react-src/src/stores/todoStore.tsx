@@ -134,6 +134,10 @@ class TodoStore {
     fetchNotes = async () => {
         const notesData = await getNotesData();
 
+        if (!notesData) {
+            return // most likely server is down
+        }
+
         runInAction(() => {
             this.notesJsonArray = notesData.results;
         })

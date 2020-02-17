@@ -75,7 +75,7 @@ class NoteDisplay extends React.Component<NoteProps, { editable: boolean, editab
         const todos = this.props.note.items.map(item => <TodoItemDisplay key={item.id} item={item} />)
 
         return (
-            <div className="col-12 col-md-6 col-lg-3">
+            <div className="col-12 col-md-6 col-lg-4 col-xl-3">
                 <div className="todo-list-container mx-auto border">
                     <div className="row">
                         <div className="col-8">

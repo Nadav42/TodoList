@@ -91,6 +91,11 @@ const patch = async (endpointUrl: String, bodyData: Object, successMsg: any, cal
 const httpDelete = async (endpointUrl: String) => {
     try {
         const response = await api.delete(`${url}${endpointUrl}`);
+        
+        if (response.data["errorMsg"]) {
+            toast.error(response.data["errorMsg"])
+        }
+
         return response.data;
     }
     catch (error) {

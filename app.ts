@@ -34,6 +34,7 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'react-src/build', 'index.html'));
 });
 
-app.use(express.static(path.join(__dirname, 'react-src/build'))); // serve static react files
+// serve static react files
+app.use(express.static(path.join(__dirname, 'react-src/build')));
 
 app.listen(config.port || 8080, () => console.log(`Example app listening on port ${config.port}!`))

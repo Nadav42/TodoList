@@ -64,10 +64,12 @@ class Note {
     fetchNoteData = async () => {
         const noteData = await getNoteById(this.id);
 
-        runInAction(() => {
-            this.name = noteData.name;
-            this.itemsJsonArray = noteData.items;
-        })
+        if (noteData._id) {
+            runInAction(() => {
+                this.name = noteData.name;
+                this.itemsJsonArray = noteData.items;
+            })
+        }
     }
 
     @action
@@ -83,8 +85,11 @@ class Note {
                 return;
             }
 
-            // create was done successfully
+            // create was done successfully - instant
             this.itemsJsonArray.push(itemData);
+
+            // sync
+            this.fetchNoteData();
         });
     }
 
@@ -110,6 +115,9 @@ class Note {
                 this.itemsJsonArray = noteData.items;
             });
         }
+        else {
+            this.fetchNoteData();
+        }
     }
 }
 
@@ -133,13 +141,16 @@ class TodoStore {
 
     @action
     addNote = () => {
-        postCreateNote("New List", (noteData: INote) => {
+        postCreateNote("רשימה חדשה", (noteData: INote) => {
             if (!noteData || !noteData._id) {
                 return;
             }
 
             // create was done successfully
             this.notesJsonArray.push(noteData);
+
+            // sync
+            this.fetchNotes();
         });
     }
 

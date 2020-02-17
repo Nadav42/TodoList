@@ -1,30 +1,31 @@
 import NotesModel from '../models/note';
 
 const MAXIMUM_NOTES_ALLOWED = 10;
+const ERROR_NOTE_DOES_NOT_EXIST = { errorMsg: "note does not exist" };
+const ERROR_INVALID_ID = { errorMsg: "invalid id" };
 
 class NotesService {
     // create a new note - max 10 allowed at once
     async createNote(name: string) {
-        const currentNotesAmount = await NotesModel.count({});
+        const currentNotesAmount = await NotesModel.count({}); // get current notes amount
 
+        // user reached maximum notes allowed
         if (currentNotesAmount >= MAXIMUM_NOTES_ALLOWED) {
             return {errorMsg: `Only ${MAXIMUM_NOTES_ALLOWED} notes are allowed at once, please remove some.`};
         }
 
-        const note = await NotesModel.create({ name: name, items: [] });
-        return note;
+        // limit not reached - add new note
+        return await NotesModel.create({ name: name, items: [] });
     }
 
     // find all notes
     async getAll() {
-        const notes = await NotesModel.find().sort([['createdAt', 'ascending']]); // find all - maximum of 10 so no need for pagination
-        return notes;
+        return await NotesModel.find().sort([['createdAt', 'ascending']]); // find all - maximum of 10 so no need for pagination
     }
 
     // find all notes
     async getById(noteId: string) {
-        const note = await NotesModel.findById(noteId);
-        return note;
+        return await NotesModel.findById(noteId);
     }
 
     // update note details 
@@ -33,14 +34,14 @@ class NotesService {
             let noteRecord = await NotesModel.findById(id);
 
             if (!noteRecord) {
-                return { errorMsg: "note not found" };
+                return ERROR_NOTE_DOES_NOT_EXIST;
             }
 
             noteRecord.name = name; // change details
             return await noteRecord.save();
 
         } catch (error) {
-            return { errorMsg: "invalid id" };
+            return ERROR_INVALID_ID;
         }
     }
 
@@ -50,12 +51,12 @@ class NotesService {
             const removedNoteRecord = await NotesModel.findByIdAndRemove(id);
 
             if (!removedNoteRecord) {
-                return { errorMsg: "note does not exist" };
+                return ERROR_NOTE_DOES_NOT_EXIST;
             }
 
             return removedNoteRecord
         } catch (error) {
-            return { errorMsg: "invalid id" };
+            return ERROR_INVALID_ID;
         }
     }
 }

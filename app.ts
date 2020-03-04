@@ -29,7 +29,24 @@ app.use(bodyParser.json());
 // api routes
 app.use(config.api.prefix, routes());
 
-app.use(require('prerender-node').set('prerenderToken', 'ngTBRXR1I492ti5TWLoe'));
+// ------------------------------------------------------------------------------------------ //
+// enable server side rendering for search engine user agents like googlebot:
+
+// important!!! 
+// 1. must put this middleware before the middleware that returns react build files or it won't work
+// 2. the prerender server on npm doesn't work! it's not updated, download the source files from github and do npm install, npm start
+// https://github.com/prerender/prerender --> the npm version doesn't strip script tags thus react keeps working and fetching stuff when it shouldn't
+// 3. do CTRL + F5 while testing to be on the safe side
+
+// render server configuration:
+
+// option 1: use the render server hosted on prerender.io (costs money)
+// app.use(require('prerender-node').set('prerenderToken', 'ngTBRXR1I492ti5TWLoe'));
+
+// option 2: use your own render server
+app.use(require('prerender-node').set('prerenderServiceUrl', 'http://localhost:8000'));
+
+// ------------------------------------------------------------------------------------------ //
 
 // serve react build
 app.get('/', function (req, res) {

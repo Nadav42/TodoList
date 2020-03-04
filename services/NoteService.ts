@@ -4,6 +4,10 @@ const MAXIMUM_NOTES_ALLOWED = 10;
 const ERROR_NOTE_DOES_NOT_EXIST = { errorMsg: "note does not exist" };
 const ERROR_INVALID_ID = { errorMsg: "invalid id" };
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 class NotesService {
     // create a new note - max 10 allowed at once
     async createNote(name: string) {
@@ -11,7 +15,7 @@ class NotesService {
 
         // user reached maximum notes allowed
         if (currentNotesAmount >= MAXIMUM_NOTES_ALLOWED) {
-            return {errorMsg: `Only ${MAXIMUM_NOTES_ALLOWED} notes are allowed at once, please remove some.`};
+            return { errorMsg: `Only ${MAXIMUM_NOTES_ALLOWED} notes are allowed at once, please remove some.` };
         }
 
         // limit not reached - add new note
@@ -20,11 +24,13 @@ class NotesService {
 
     // find all notes
     async getAll() {
+        await sleep(2000);
         return await NotesModel.find().sort([['createdAt', 'ascending']]); // find all - maximum of 10 so no need for pagination
     }
 
     // find all notes
     async getById(noteId: string) {
+        await sleep(2000);
         return await NotesModel.findById(noteId);
     }
 

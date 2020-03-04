@@ -13,5 +13,6 @@ export default {
     databaseURL: process.env.MONGODB_URI,
     api: {
         prefix: '/api',
-    }
+    },
+    prerenderToken: process.env.PRE_RENDER_TOKEN
 };

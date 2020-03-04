@@ -39,14 +39,27 @@ app.use(config.api.prefix, routes());
 // 3. do CTRL + F5 while testing to be on the safe side
 
 // render server configuration:
-
-if (config.prerenderToken && config.prerenderToken.length > 0) {
-    // option 1: use the render server hosted on prerender.io (costs money but works good)
-    app.use(require('prerender-node').set('prerenderToken', config.prerenderToken));
+// prerender works good from my tests
+// rendertron doesn't work very good from my tests (css not complete, errors sometimes etc)
+if (config.prerenderMode === 'prerender') {
+    if (config.prerenderToken && config.prerenderToken.length > 0) {
+        // option 1: use the render server hosted on prerender.io (costs money but works good)
+        app.use(require('prerender-node').set('prerenderToken', config.prerenderToken));
+    }
+    else {
+        // option 2: use your own render server ("free" but need to run from source because npm version doesn't strip script tags)
+        app.use(require('prerender-node').set('prerenderServiceUrl', 'http://localhost:8000'));
+    }
 }
-else {
-    // option 2: use your own render server ("free" but need to run from source because npm version doesn't strip script tags)
-    app.use(require('prerender-node').set('prerenderServiceUrl', 'http://localhost:8000'));
+else if (config.prerenderMode === 'rendertron') {
+    const rendertron = require('rendertron-middleware');
+    const botUserAgents = ['Baiduspider', 'bingbot', 'googlebot'];
+
+    app.use(rendertron.makeMiddleware({
+        proxyUrl: 'http://localhost:8000/render',
+        userAgentPattern: new RegExp(botUserAgents.join('|'), 'i'),
+        injectShadyDom: true
+    }));
 }
 
 // ------------------------------------------------------------------------------------------ //

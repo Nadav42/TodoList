@@ -6,7 +6,7 @@ const WAIT_AFTER_LAST_REQUEST = process.env.WAIT_AFTER_LAST_REQUEST || 500;
 
 const PAGE_DONE_CHECK_INTERVAL = process.env.PAGE_DONE_CHECK_INTERVAL || 500;
 
-const PAGE_LOAD_TIMEOUT = process.env.PAGE_LOAD_TIMEOUT || 20 * 1000;
+const PAGE_LOAD_TIMEOUT = process.env.PAGE_LOAD_TIMEOUT || 60 * 1000;
 
 const FOLLOW_REDIRECTS = process.env.FOLLOW_REDIRECTS || false;
 
@@ -190,6 +190,9 @@ server.onRequest = function(req, res) {
 	req.prerender = util.getOptions(req);
 	req.prerender.start = new Date();
 	req.prerender.responseSent = false;
+
+	// req.prerender.url = "https://www.ice36.com/"; // works good
+	// req.prerender.url = "https://www.slingo.com/en-ROW/"; // doesn't work?
 
 	util.log('getting', req.prerender.url);
 

@@ -29,6 +29,8 @@ app.use(bodyParser.json());
 // api routes
 app.use(config.api.prefix, routes());
 
+app.use(require('prerender-node').set('prerenderToken', 'ngTBRXR1I492ti5TWLoe'));
+
 // serve react build
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'react-src/build', 'index.html'));

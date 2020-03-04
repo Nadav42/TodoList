@@ -40,10 +40,10 @@ app.use(config.api.prefix, routes());
 
 // render server configuration:
 
-// option 1: use the render server hosted on prerender.io (costs money)
+// option 1: use the render server hosted on prerender.io (costs money but works good)
 // app.use(require('prerender-node').set('prerenderToken', 'ngTBRXR1I492ti5TWLoe'));
 
-// option 2: use your own render server
+// option 2: use your own render server ("free" but need to run from source because npm version doesn't strip script tags)
 app.use(require('prerender-node').set('prerenderServiceUrl', 'http://localhost:8000'));
 
 // ------------------------------------------------------------------------------------------ //

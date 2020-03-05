@@ -48,7 +48,7 @@ if (config.prerenderMode === 'prerender') {
     }
     else {
         // option 2: use your own render server ("free" but need to run from source because npm version doesn't strip script tags)
-        app.use(require('prerender-node').set('prerenderServiceUrl', 'http://localhost:8000'));
+        app.use(require('prerender-node').set('prerenderServiceUrl', config.prerenderServiceUrl));
     }
 }
 else if (config.prerenderMode === 'rendertron') {

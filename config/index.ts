@@ -15,5 +15,6 @@ export default {
         prefix: '/api',
     },
     prerenderToken: process.env.PRE_RENDER_TOKEN,
-    prerenderMode: String(process.env.PRE_RENDER_MODE).replace(/'/g, "")
+    prerenderMode: String(process.env.PRE_RENDER_MODE).replace(/'/g, ""),
+    prerenderServiceUrl: process.env.PRE_RENDER_SERVICE_URL
 };

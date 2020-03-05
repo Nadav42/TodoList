@@ -11,7 +11,7 @@ chrome.name = 'Chrome';
 
 
 
-chrome.spawn = function(options) {
+chrome.spawn = function (options) {
 	return new Promise((resolve, reject) => {
 		this.options = options;
 		let location = this.getChromeLocation();
@@ -21,7 +21,7 @@ chrome.spawn = function(options) {
 			return reject();
 		}
 
-		this.chromeChild = spawn(location, this.options.chromeFlags || ['--headless', '--disable-gpu', '--remote-debugging-port=9222', '--hide-scrollbars']);
+		this.chromeChild = spawn(location, this.options.chromeFlags || ['--no-sandbox', '--headless', '--disable-gpu', '--remote-debugging-port=9222', '--hide-scrollbars']);
 
 		resolve();
 	});
@@ -29,13 +29,13 @@ chrome.spawn = function(options) {
 
 
 
-chrome.onClose = function(callback) {
+chrome.onClose = function (callback) {
 	this.chromeChild.on('close', callback);
 };
 
 
 
-chrome.kill = function() {
+chrome.kill = function () {
 	if (this.chromeChild) {
 		this.chromeChild.kill('SIGINT');
 	}
@@ -43,7 +43,7 @@ chrome.kill = function() {
 
 
 
-chrome.connect = function() {
+chrome.connect = function () {
 	return new Promise((resolve, reject) => {
 		let connected = false;
 		let timeout = setTimeout(() => {
@@ -76,7 +76,7 @@ chrome.connect = function() {
 
 
 
-chrome.getChromeLocation = function() {
+chrome.getChromeLocation = function () {
 	if (this.options.chromeLocation) {
 		return this.options.chromeLocation;
 	}
@@ -98,70 +98,70 @@ chrome.getChromeLocation = function() {
 
 
 
-chrome.openTab = function(options) {
+chrome.openTab = function (options) {
 	return new Promise((resolve, reject) => {
 
 		let browserContext = null;
 		let browser = null;
 
 		CDP({ target: this.webSocketDebuggerURL })
-		.then((chromeBrowser) => {
-			browser = chromeBrowser;
+			.then((chromeBrowser) => {
+				browser = chromeBrowser;
 
-			return browser.Target.createBrowserContext();
-		}).then(({ browserContextId }) => {
+				return browser.Target.createBrowserContext();
+			}).then(({ browserContextId }) => {
 
-			browserContext = browserContextId;
+				browserContext = browserContextId;
 
-			return browser.Target.createTarget({
-				url: 'about:blank',
-				browserContextId
-			});
-		}).then(({ targetId }) => {
+				return browser.Target.createTarget({
+					url: 'about:blank',
+					browserContextId
+				});
+			}).then(({ targetId }) => {
 
-			return CDP({ target: targetId });
-		}).then((tab) => {
+				return CDP({ target: targetId });
+			}).then((tab) => {
 
-			//we're going to put our state on the chrome tab for now
-			//we should clean this up later
-			tab.browserContextId = browserContext;
-			tab.browser = browser;
-			tab.prerender = options;
-			tab.prerender.requests = {};
-			tab.prerender.numRequestsInFlight = 0;
+				//we're going to put our state on the chrome tab for now
+				//we should clean this up later
+				tab.browserContextId = browserContext;
+				tab.browser = browser;
+				tab.prerender = options;
+				tab.prerender.requests = {};
+				tab.prerender.numRequestsInFlight = 0;
 
-			return this.setUpEvents(tab);
-		}).then((tab) => {
+				return this.setUpEvents(tab);
+			}).then((tab) => {
 
-			resolve(tab);
-		}).catch((err) => { reject(err) });
+				resolve(tab);
+			}).catch((err) => { reject(err) });
 	});
 };
 
 
 
-chrome.closeTab = function(tab) {
+chrome.closeTab = function (tab) {
 	return new Promise((resolve, reject) => {
 
-		tab.browser.Target.closeTarget({targetId: tab.target})
-		.then(() => {
+		tab.browser.Target.closeTarget({ targetId: tab.target })
+			.then(() => {
 
-			return tab.browser.Target.disposeBrowserContext({ browserContextId: tab.browserContextId });
-		}).then(() => {
+				return tab.browser.Target.disposeBrowserContext({ browserContextId: tab.browserContextId });
+			}).then(() => {
 
-			return tab.browser.close();
-		}).then(() => {
+				return tab.browser.close();
+			}).then(() => {
 
-			resolve();
-		}).catch((err) => {
-			reject(err);
-		});
+				resolve();
+			}).catch((err) => {
+				reject(err);
+			});
 	});
 };
 
 
 
-chrome.setUpEvents = function(tab) {
+chrome.setUpEvents = function (tab) {
 	return new Promise((resolve, reject) => {
 
 		const {
@@ -194,16 +194,16 @@ chrome.setUpEvents = function(tab) {
 				user: undefined
 			};
 
-			Page.domContentEventFired(({timestamp}) => {
+			Page.domContentEventFired(({ timestamp }) => {
 				tab.prerender.domContentEventFired = true;
 				tab.prerender.pageLoadInfo.domContentEventFiredMs = timestamp * 1000;
 			});
 
-			Page.loadEventFired(({timestamp}) => {
+			Page.loadEventFired(({ timestamp }) => {
 				tab.prerender.pageLoadInfo.loadEventFiredMs = timestamp * 1000;
 			});
 
-			Security.certificateError(({eventId}) => {
+			Security.certificateError(({ eventId }) => {
 				Security.handleCertificateError({
 					eventId,
 					action: 'continue'
@@ -212,7 +212,7 @@ chrome.setUpEvents = function(tab) {
 				});
 			});
 
-			Security.setOverrideCertificateErrors({override: true});
+			Security.setOverrideCertificateErrors({ override: true });
 
 			Network.setUserAgentOverride({
 				userAgent: tab.prerender.userAgent || this.options.userAgent || this.originalUserAgent + ' Prerender (+https://github.com/prerender/prerender)'
@@ -224,7 +224,7 @@ chrome.setUpEvents = function(tab) {
 				bypassServiceWorker = !tab.prerender.enableServiceWorker;
 			}
 
-			Network.setBypassServiceWorker({bypass: bypassServiceWorker})
+			Network.setBypassServiceWorker({ bypass: bypassServiceWorker })
 
 			Network.requestWillBeSent((params) => {
 				tab.prerender.numRequestsInFlight++;
@@ -274,7 +274,7 @@ chrome.setUpEvents = function(tab) {
 				}
 			});
 
-			Network.dataReceived(({requestId, dataLength}) => {
+			Network.dataReceived(({ requestId, dataLength }) => {
 				let entry = tab.prerender.pageLoadInfo.entries[requestId];
 				if (!entry) {
 					return;
@@ -285,7 +285,7 @@ chrome.setUpEvents = function(tab) {
 			Network.responseReceived((params) => {
 				//there is a case where responseReceived can be called twice
 				//for the same URL. We will check to see if we've already counted this resource first
-				if(tab.prerender.requests[params.requestId]) {
+				if (tab.prerender.requests[params.requestId]) {
 					tab.prerender.numRequestsInFlight--;
 					tab.prerender.lastRequestReceivedAt = new Date().getTime();
 
@@ -303,12 +303,12 @@ chrome.setUpEvents = function(tab) {
 						tab.prerender.headers = params.response.headers;
 
 						//if we get a 304 from the server, turn it into a 200 on our end
-						if(tab.prerender.statusCode == 304) tab.prerender.statusCode = 200;
+						if (tab.prerender.statusCode == 304) tab.prerender.statusCode = 200;
 					}
 				}
 			});
 
-			Network.resourceChangedPriority(({requestId, newPriority}) => {
+			Network.resourceChangedPriority(({ requestId, newPriority }) => {
 				let entry = tab.prerender.pageLoadInfo.entries[requestId];
 				if (!entry) {
 					return;
@@ -316,7 +316,7 @@ chrome.setUpEvents = function(tab) {
 				entry.newPriority = newPriority;
 			});
 
-			Network.loadingFinished(({requestId, timestamp, encodedDataLength}) => {
+			Network.loadingFinished(({ requestId, timestamp, encodedDataLength }) => {
 				let entry = tab.prerender.pageLoadInfo.entries[requestId];
 				if (!entry) {
 					return;
@@ -330,7 +330,7 @@ chrome.setUpEvents = function(tab) {
 			Network.loadingFailed((params) => {
 				//there is a case where loadingFailed can be called after responseReceived
 				//for the same URL. We will check to see if we've already counted this resource first
-				if(tab.prerender.requests[params.requestId]) {
+				if (tab.prerender.requests[params.requestId]) {
 					tab.prerender.numRequestsInFlight--;
 					if (tab.prerender.logRequests || this.options.logRequests) util.log('-', tab.prerender.numRequestsInFlight, tab.prerender.requests[params.requestId]);
 					delete tab.prerender.requests[params.requestId];
@@ -362,7 +362,7 @@ chrome.setUpEvents = function(tab) {
 
 
 
-chrome.loadUrlThenWaitForPageLoadEvent = function(tab, url) {
+chrome.loadUrlThenWaitForPageLoadEvent = function (tab, url) {
 	return new Promise((resolve, reject) => {
 		tab.prerender.url = url;
 
@@ -374,91 +374,91 @@ chrome.loadUrlThenWaitForPageLoadEvent = function(tab, url) {
 
 
 		Page.enable()
-		.then(() => {
+			.then(() => {
 
-			let pageDoneCheckInterval = tab.prerender.pageDoneCheckInterval || this.options.pageDoneCheckInterval;
-			let pageLoadTimeout = tab.prerender.pageLoadTimeout || this.options.pageLoadTimeout;
+				let pageDoneCheckInterval = tab.prerender.pageDoneCheckInterval || this.options.pageDoneCheckInterval;
+				let pageLoadTimeout = tab.prerender.pageLoadTimeout || this.options.pageLoadTimeout;
 
-			var checkIfDone = () => {
-				if (finished) {return;}
+				var checkIfDone = () => {
+					if (finished) { return; }
 
-				if ((tab.prerender.renderType === 'jpeg' || tab.prerender.renderType === 'png') && tab.prerender.fullpage) {
-					tab.Runtime.evaluate({
-						expression: 'window.scrollBy(0, window.innerHeight);'
-					});
-				}
+					if ((tab.prerender.renderType === 'jpeg' || tab.prerender.renderType === 'png') && tab.prerender.fullpage) {
+						tab.Runtime.evaluate({
+							expression: 'window.scrollBy(0, window.innerHeight);'
+						});
+					}
 
 
-				this.checkIfPageIsDoneLoading(tab).then((doneLoading) => {
-					if (doneLoading && !finished) {
-						finished = true;
+					this.checkIfPageIsDoneLoading(tab).then((doneLoading) => {
+						if (doneLoading && !finished) {
+							finished = true;
 
-						if ((tab.prerender.renderType === 'jpeg' || tab.prerender.renderType === 'png') && tab.prerender.fullpage) {
-							tab.Runtime.evaluate({
-								expression: 'window.scrollTo(0, 0);'
-							});
+							if ((tab.prerender.renderType === 'jpeg' || tab.prerender.renderType === 'png') && tab.prerender.fullpage) {
+								tab.Runtime.evaluate({
+									expression: 'window.scrollTo(0, 0);'
+								});
+							}
+
+							resolve();
 						}
 
+						if (!doneLoading && !finished) {
+							setTimeout(checkIfDone, pageDoneCheckInterval);
+						}
+					}).catch((e) => {
+						finished = true;
+						util.log('Chrome connection closed during request');
+						tab.prerender.statusCode = 504;
+						reject();
+					});
+				};
+
+				setTimeout(() => {
+					if (!finished) {
+						finished = true;
+						util.log('page timed out', tab.prerender.url);
 						resolve();
 					}
+				}, pageLoadTimeout);
 
-					if (!doneLoading && !finished) {
-						setTimeout(checkIfDone, pageDoneCheckInterval);
-					}
-				}).catch((e) => {
-					finished = true;
-					util.log('Chrome connection closed during request');
+				Page.addScriptToEvaluateOnNewDocument({ source: 'if (window.customElements) customElements.forcePolyfill = true' })
+				Page.addScriptToEvaluateOnNewDocument({ source: 'ShadyDOM = {force: true}' })
+				Page.addScriptToEvaluateOnNewDocument({ source: 'ShadyCSS = {shimcssproperties: true}' })
+
+				let width = parseInt(tab.prerender.width, 10) || 1440;
+				let height = parseInt(tab.prerender.height, 10) || 718;
+
+				Emulation.setDeviceMetricsOverride({
+					width: width,
+					screenWidth: width,
+					height: height,
+					screenHeight: height,
+					deviceScaleFactor: 0,
+					mobile: false
+				});
+
+				Page.navigate({
+					url: tab.prerender.url
+				}).then(() => {
+					setTimeout(checkIfDone, pageDoneCheckInterval);
+				}).catch(() => {
+					util.log('invalid URL sent to Chrome:', tab.prerender.url);
 					tab.prerender.statusCode = 504;
+					finished = true;
 					reject();
 				});
-			};
-
-			setTimeout(() => {
-				if (!finished) {
-					finished = true;
-					util.log('page timed out', tab.prerender.url);
-					resolve();
-				}
-			}, pageLoadTimeout);
-
-			Page.addScriptToEvaluateOnNewDocument({source: 'if (window.customElements) customElements.forcePolyfill = true'})
-			Page.addScriptToEvaluateOnNewDocument({source: 'ShadyDOM = {force: true}'})
-			Page.addScriptToEvaluateOnNewDocument({source: 'ShadyCSS = {shimcssproperties: true}'})
-
-			let width = parseInt(tab.prerender.width, 10) || 1440;
-			let height = parseInt(tab.prerender.height, 10) || 718;
-
-			Emulation.setDeviceMetricsOverride({
-				width: width,
-				screenWidth: width,
-				height: height,
-				screenHeight: height,
-				deviceScaleFactor: 0,
-				mobile: false
-			});
-
-			Page.navigate({
-				url: tab.prerender.url
-			}).then(() => {
-				setTimeout(checkIfDone, pageDoneCheckInterval);
-			}).catch(() => {
-				util.log('invalid URL sent to Chrome:', tab.prerender.url);
+			}).catch((err) => {
+				util.log('unable to load URL', err);
 				tab.prerender.statusCode = 504;
 				finished = true;
 				reject();
 			});
-		}).catch((err) => {
-			util.log('unable to load URL', err);
-			tab.prerender.statusCode = 504;
-			finished = true;
-			reject();
-		});
 	});
 };
 
 
 
-chrome.checkIfPageIsDoneLoading = function(tab) {
+chrome.checkIfPageIsDoneLoading = function (tab) {
 	return new Promise((resolve, reject) => {
 
 		if (!(tab.prerender.domContentEventFired || tab.prerender.receivedRedirect)) {
@@ -487,21 +487,21 @@ chrome.checkIfPageIsDoneLoading = function(tab) {
 
 
 
-chrome.executeJavascript = function(tab, javascript) {
+chrome.executeJavascript = function (tab, javascript) {
 	return new Promise((resolve, reject) => {
 		tab.Runtime.evaluate({
 			expression: javascript
 		}).then((result) => {
 
 			//give previous javascript a little time to execute
-			setTimeout( () => {
+			setTimeout(() => {
 
 				tab.Runtime.evaluate({
 					expression: "(window.prerenderData && typeof window.prerenderData == 'object' && JSON.stringify(window.prerenderData)) || window.prerenderData"
 				}).then((result) => {
 					try {
 						tab.prerender.prerenderData = JSON.parse(result && result.result && result.result.value);
-					} catch(e) {
+					} catch (e) {
 						tab.prerender.prerenderData = result.result.value;
 					}
 					resolve();
@@ -522,7 +522,7 @@ chrome.executeJavascript = function(tab, javascript) {
 
 
 
-chrome.parseHtmlFromPage = function(tab) {
+chrome.parseHtmlFromPage = function (tab) {
 	return new Promise((resolve, reject) => {
 
 		var parseTimeout = setTimeout(() => {
@@ -543,10 +543,10 @@ chrome.parseHtmlFromPage = function(tab) {
 
 			let doctype = '';
 			if (response && response.result && response.result.value) {
-				let obj = {name: 'html'};
+				let obj = { name: 'html' };
 				try {
 					obj = JSON.parse(response.result.value);
-				} catch(e) {}
+				} catch (e) { }
 
 				doctype = "<!DOCTYPE "
 					+ obj.name
@@ -569,7 +569,7 @@ chrome.parseHtmlFromPage = function(tab) {
 };
 
 
-chrome.captureScreenshot = function(tab, format, fullpage) {
+chrome.captureScreenshot = function (tab, format, fullpage) {
 	return new Promise((resolve, reject) => {
 
 		var parseTimeout = setTimeout(() => {
@@ -612,7 +612,7 @@ chrome.captureScreenshot = function(tab, format, fullpage) {
 };
 
 
-chrome.printToPDF = function(tab, options) {
+chrome.printToPDF = function (tab, options) {
 	return new Promise((resolve, reject) => {
 
 		var parseTimeout = setTimeout(() => {
@@ -636,7 +636,7 @@ chrome.printToPDF = function(tab, options) {
 };
 
 
-chrome.getHarFile = function(tab) {
+chrome.getHarFile = function (tab) {
 	return new Promise((resolve, reject) => {
 
 		var packageInfo = require('../../package');
@@ -694,19 +694,19 @@ function parseEntries(entries) {
 			return null;
 		}
 
-		const {request} = entry.requestParams;
-		const {response} = entry.responseParams;
+		const { request } = entry.requestParams;
+		const { response } = entry.responseParams;
 
 		const wallTimeMs = entry.requestParams.wallTime * 1000;
 		const startedDateTime = new Date(wallTimeMs).toISOString();
 		const httpVersion = response.protocol || 'unknown';
-		const {method} = request;
+		const { method } = request;
 		const loadedUrl = request.url;
-		const {status, statusText} = response;
+		const { status, statusText } = response;
 		const headers = parseHeaders(httpVersion, request, response);
 		const redirectURL = getHeaderValue(response.headers, 'location', '');
 		const queryString = url.parse(request.url, true).query;
-		const {time, timings} = computeTimings(entry);
+		const { time, timings } = computeTimings(entry);
 
 		let serverIPAddress = response.remoteIPAddress;
 		if (serverIPAddress) {
@@ -715,11 +715,11 @@ function parseEntries(entries) {
 
 		const connection = String(response.connectionId);
 		const _initiator = entry.requestParams.initiator;
-		const {changedPriority} = entry;
+		const { changedPriority } = entry;
 		const newPriority = changedPriority && changedPriority.newPriority;
 		const _priority = newPriority || request.initialPriority;
 		const payload = computePayload(entry, headers);
-		const {mimeType} = response;
+		const { mimeType } = response;
 		const encoding = entry.responseBodyIsBase64 ? 'base64' : undefined;
 
 		harEntries.push({
@@ -850,20 +850,20 @@ function computePayload(entry, headers) {
 function zipNameValue(map) {
 	const pairs = [];
 
-	Object.keys(map).forEach(function(name) {
+	Object.keys(map).forEach(function (name) {
 		const value = map[name];
 		const values = Array.isArray(value) ? value : [value];
 		for (const value of values) {
-			pairs.push({name, value});
+			pairs.push({ name, value });
 		}
 	});
 	return pairs;
 }
 
 function getRawRequest(request, headerPairs) {
-	const {method, url, protocol} = request;
+	const { method, url, protocol } = request;
 	const lines = [`${method} ${url} ${protocol}`];
-	for (const {name, value} of headerPairs) {
+	for (const { name, value } of headerPairs) {
 		lines.push(`${name}: ${value}`);
 	}
 	lines.push('', '');
@@ -871,9 +871,9 @@ function getRawRequest(request, headerPairs) {
 }
 
 function getRawResponse(response, headerPairs) {
-	const {status, statusText, protocol} = response;
+	const { status, statusText, protocol } = response;
 	const lines = [`${protocol} ${status} ${statusText}`];
-	for (const {name, value} of headerPairs) {
+	for (const { name, value } of headerPairs) {
 		lines.push(`${name}: ${value}`);
 	}
 	lines.push('', '');
@@ -898,27 +898,27 @@ function computeTimings(entry) {
 	const time = toMilliseconds(finishedTimestamp - timing.requestTime);
 	// compute individual components
 	const blocked = firstNonNegative([
-			timing.dnsStart, timing.connectStart, timing.sendStart
+		timing.dnsStart, timing.connectStart, timing.sendStart
 	]);
 	let dns = -1;
 	if (timing.dnsStart >= 0) {
-			const start = firstNonNegative([timing.connectStart, timing.sendStart]);
-			dns = start - timing.dnsStart;
+		const start = firstNonNegative([timing.connectStart, timing.sendStart]);
+		dns = start - timing.dnsStart;
 	}
 	let connect = -1;
 	if (timing.connectStart >= 0) {
-			connect = timing.sendStart - timing.connectStart;
+		connect = timing.sendStart - timing.connectStart;
 	}
 	const send = timing.sendEnd - timing.sendStart;
 	const wait = timing.receiveHeadersEnd - timing.sendEnd;
 	const receive = time - timing.receiveHeadersEnd;
 	let ssl = -1;
 	if (timing.sslStart >= 0 && timing.sslEnd >= 0) {
-			ssl = timing.sslEnd - timing.sslStart;
+		ssl = timing.sslEnd - timing.sslStart;
 	}
 	return {
-			time,
-			timings: {blocked, dns, connect, send, wait, receive, ssl}
+		time,
+		timings: { blocked, dns, connect, send, wait, receive, ssl }
 	};
 };
 

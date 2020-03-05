@@ -184,7 +184,7 @@ server.use = function(plugin) {
 };
 
 
-
+// handle render requests
 server.onRequest = function(req, res) {
 
 	req.prerender = util.getOptions(req);
@@ -230,7 +230,7 @@ server.onRequest = function(req, res) {
 
 		return this.firePluginEvent('tabCreated', req, res);
 	}).then(() => {
-
+		// load the page in a new tab
 		return this.browser.loadUrlThenWaitForPageLoadEvent(req.prerender.tab, req.prerender.url);
 	}).then(() => {
 
@@ -257,7 +257,7 @@ server.onRequest = function(req, res) {
 
 			return this.browser.getHarFile(req.prerender.tab);
 		} else {
-
+			// return the html
 			return this.browser.parseHtmlFromPage(req.prerender.tab);
 		}
 	}).then(() => {

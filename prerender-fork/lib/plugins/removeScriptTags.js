@@ -4,6 +4,7 @@ module.exports = {
 			return next();
 		}
 
+		// remove all script tags
 		var matches = req.prerender.content.toString().match(/<script(?:.*?)>(?:[\S\s]*?)<\/script>/gi);
 		for (let i = 0; matches && i < matches.length; i++) {
 			if (matches[i].indexOf('application/ld+json') === -1) {

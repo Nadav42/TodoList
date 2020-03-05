@@ -13,7 +13,13 @@ module.exports = {
 		}
 
 		//<link rel="import" src=""> tags can contain script tags. Since they are already rendered, let's remove them
-		matches = req.prerender.content.toString().match(/<link[^>]+?rel="import"[^>]*?>/i);
+		matches = req.prerender.content.toString().match(/<link[^>]+?rel="import"[^>]*?>/gi);
+		for (let i = 0; matches && i < matches.length; i++) {
+			req.prerender.content = req.prerender.content.toString().replace(matches[i], '');
+		}
+
+		// also need to block prefetch scripts like <link rel="preload" as="script" href="/static/js/main.js">
+		matches = req.prerender.content.toString().match(/<link[^>]+?rel="(preload|prefetch|preconnect)"[^>]*?>/gi);
 		for (let i = 0; matches && i < matches.length; i++) {
 			req.prerender.content = req.prerender.content.toString().replace(matches[i], '');
 		}

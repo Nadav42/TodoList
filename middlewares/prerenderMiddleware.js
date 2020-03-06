@@ -6,37 +6,19 @@ var prerender = module.exports = function (req, res, next) {
 	if (!prerender.shouldShowPrerenderedPage(req)) return next();
 
 	try {
-		prerender.beforeRenderFn(req, function (err, cachedRender) {
-
-			if (!err && cachedRender) {
-				if (typeof cachedRender == 'string') {
-					res.writeHead(200, {
-						"Content-Type": "text/html"
-					});
-					return res.end(cachedRender);
-				} else if (typeof cachedRender == 'object') {
-					res.writeHead(cachedRender.status || 200, {
-						"Content-Type": "text/html"
-					});
-					return res.end(cachedRender.body || '');
-				}
+		prerender.getPrerenderedPageResponse(req, function (err, prerenderedResponse) {
+			if (err || !prerenderedResponse || prerenderedResponse.statusCode >= 500) {
+				console.log("prerender error", err);
+				return next();
 			}
 
-			prerender.getPrerenderedPageResponse(req, function (err, prerenderedResponse) {
-				prerender.afterRenderFn(err, req, prerenderedResponse);
-
-				if (prerenderedResponse) {
-					res.writeHead(prerenderedResponse.statusCode, prerenderedResponse.headers);
-					return res.end(prerenderedResponse.body);
-				} else {
-					console.log("prerender error", err);
-					next();
-				}
-			});
+			// console.log("cachedRender", prerenderedResponse);
+			res.writeHead(prerenderedResponse.statusCode, prerenderedResponse.headers);
+			return res.end(prerenderedResponse.body);
 		});
 	} catch (err) {
 		console.log("prerender try / catch error", err);
-		next();
+		return next();
 	}
 };
 
@@ -270,20 +252,6 @@ prerender.buildApiUrl = function (req) {
 prerender.getPrerenderServiceUrl = function () {
 	return this.prerenderServiceUrl || process.env.PRERENDER_SERVICE_URL || 'https://service.prerender.io/';
 };
-
-prerender.beforeRenderFn = function (req, done) {
-	if (!this.beforeRender) return done();
-
-	return this.beforeRender(req, done);
-};
-
-
-prerender.afterRenderFn = function (err, req, prerender_res) {
-	if (!this.afterRender) return;
-
-	this.afterRender(err, req, prerender_res);
-};
-
 
 prerender.set = function (name, value) {
 	this[name] = value;

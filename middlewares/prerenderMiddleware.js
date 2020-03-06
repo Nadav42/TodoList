@@ -195,15 +195,19 @@ prerender.getPrerenderedPageResponse = function (req, callback) {
 		options.headers['X-Prerender-Token'] = this.prerenderToken || process.env.PRERENDER_TOKEN;
 	}
 
-	request.get(options).on('response', function (response) {
-		if (response.headers['content-encoding'] && response.headers['content-encoding'] === 'gzip') {
-			prerender.gunzipResponse(response, callback);
-		} else {
-			prerender.plainResponse(response, callback);
-		}
-	}).on('error', function (err) {
+	try {
+		request.get(options).on('response', function (response) {
+			if (response.headers['content-encoding'] && response.headers['content-encoding'] === 'gzip') {
+				prerender.gunzipResponse(response, callback);
+			} else {
+				prerender.plainResponse(response, callback);
+			}
+		}).on('error', function (err) {
+			callback(err);
+		});
+	} catch (err) {
 		callback(err);
-	});
+	}
 };
 
 prerender.gunzipResponse = function (response, callback) {

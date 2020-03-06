@@ -2,6 +2,11 @@ var request = require('request');
 var url = require('url');
 var zlib = require('zlib');
 
+function isValidRemoteIp(ipAddress) {
+	const IP_REGEX = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+	return IP_REGEX.test(ipAddress);
+}
+
 var prerender = module.exports = function (req, res, next) {
 	if (!prerender.shouldShowPrerenderedPage(req)) return next();
 
@@ -189,11 +194,12 @@ prerender.getPrerenderedPageResponse = function (req, callback) {
 
 	// save original request ip
 	const xForwardedClientIp = (req.headers['x-forwarded-for'] || '').split(',')[0]; // x-forwarded-for: client, proxy1, proxy2, proxy3 - we want the original client
-	const originalIp = xForwardedClientIp || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress; // store original ip
+	const cloudflareIp = req.headers['cf-connecting-ip'];
+	const originalIp = req.query.gl || cloudflareIp || xForwardedClientIp || req.connection.remoteAddress; // store original ip
 
-	if (originalIp) {
+	if (originalIp && isValidRemoteIp(originalIp)) {
+		// console.log("Injecting originalIp header =", originalIp);
 		options.headers["prerender-original-ip"] = originalIp;
-		// console.log("Injected originalIp header =", originalIp);
 	}
 
 	// get html from the prerender server

@@ -7,8 +7,13 @@ var prerender = module.exports = function (req, res, next) {
 
 	try {
 		prerender.getPrerenderedPageResponse(req, function (err, prerenderedResponse) {
-			if (err || !prerenderedResponse || prerenderedResponse.statusCode != 200) {
-				console.log("prerender error", prerenderedResponse.statusCode, err);
+			if (err || !prerenderedResponse) {
+				console.log("prerender error", err);
+				return next();
+			}
+
+			if (prerenderedResponse && prerenderedResponse.statusCode != 200) {
+				console.log("prerender ignoring status code", prerenderedResponse.statusCode);
 				return next();
 			}
 
@@ -188,7 +193,7 @@ prerender.getPrerenderedPageResponse = function (req, callback) {
 
 	if (originalIp) {
 		options.headers["prerender-original-ip"] = originalIp;
-		console.log("Injected originalIp header =", originalIp);
+		// console.log("Injected originalIp header =", originalIp);
 	}
 
 	// get html from the prerender server

@@ -26,9 +26,6 @@ app.use(cors());
 // convert raw req.body to json
 app.use(bodyParser.json());
 
-// api routes
-app.use(config.api.prefix, routes());
-
 // ------------------------------------------------------------------------------------------ //
 // enable server side rendering for search engine user agents like googlebot:
 
@@ -63,6 +60,9 @@ else if (config.prerenderMode === 'rendertron') {
 }
 
 // ------------------------------------------------------------------------------------------ //
+
+// api routes
+app.use(config.api.prefix, routes());
 
 // serve react build
 app.get('/', function (req, res) {

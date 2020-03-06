@@ -7,8 +7,8 @@ var prerender = module.exports = function (req, res, next) {
 
 	try {
 		prerender.getPrerenderedPageResponse(req, function (err, prerenderedResponse) {
-			if (err || !prerenderedResponse || prerenderedResponse.statusCode >= 500) {
-				console.log("prerender error", err);
+			if (err || !prerenderedResponse || prerenderedResponse.statusCode != 200) {
+				console.log("prerender error", prerenderedResponse.statusCode, err);
 				return next();
 			}
 
@@ -182,6 +182,16 @@ prerender.getPrerenderedPageResponse = function (req, callback) {
 		options.headers['X-Prerender-Token'] = this.prerenderToken || process.env.PRERENDER_TOKEN;
 	}
 
+	// save original request ip
+	const xForwardedClientIp = (req.headers['x-forwarded-for'] || '').split(',')[0]; // x-forwarded-for: client, proxy1, proxy2, proxy3 - we want the original client
+	const originalIp = xForwardedClientIp || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress; // store original ip
+
+	if (originalIp) {
+		options.headers["prerender-original-ip"] = originalIp;
+		console.log("Injected originalIp header =", originalIp);
+	}
+
+	// get html from the prerender server
 	try {
 		request.get(options).on('response', function (response) {
 			if (response.headers['content-encoding'] && response.headers['content-encoding'] === 'gzip') {

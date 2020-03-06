@@ -25,7 +25,6 @@
     "express": "^4.17.1",
     "mongoose": "^5.8.11",
     "node-fetch": "^2.6.0",
-    "prerender-node": "^3.2.5",
     "rendertron-middleware": "^0.1.5",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.5"

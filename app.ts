@@ -44,11 +44,11 @@ app.use(config.api.prefix, routes());
 if (config.prerenderMode === 'prerender') {
     if (config.prerenderToken && config.prerenderToken.length > 0) {
         // option 1: use the render server hosted on prerender.io (costs money but works good)
-        app.use(require('prerender-node').set('prerenderToken', config.prerenderToken));
+        app.use(require('./middlewares/prerenderMiddleware').set('prerenderToken', config.prerenderToken));
     }
     else {
         // option 2: use your own render server ("free" but need to run from source because npm version doesn't strip script tags)
-        app.use(require('prerender-node').set('prerenderServiceUrl', config.prerenderServiceUrl));
+        app.use(require('./middlewares/prerenderMiddleware').set('prerenderServiceUrl', config.prerenderServiceUrl));
     }
 }
 else if (config.prerenderMode === 'rendertron') {

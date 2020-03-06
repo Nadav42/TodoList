@@ -5,34 +5,39 @@ var zlib = require('zlib');
 var prerender = module.exports = function (req, res, next) {
 	if (!prerender.shouldShowPrerenderedPage(req)) return next();
 
-	prerender.beforeRenderFn(req, function (err, cachedRender) {
+	try {
+		prerender.beforeRenderFn(req, function (err, cachedRender) {
 
-		if (!err && cachedRender) {
-			if (typeof cachedRender == 'string') {
-				res.writeHead(200, {
-					"Content-Type": "text/html"
-				});
-				return res.end(cachedRender);
-			} else if (typeof cachedRender == 'object') {
-				res.writeHead(cachedRender.status || 200, {
-					"Content-Type": "text/html"
-				});
-				return res.end(cachedRender.body || '');
+			if (!err && cachedRender) {
+				if (typeof cachedRender == 'string') {
+					res.writeHead(200, {
+						"Content-Type": "text/html"
+					});
+					return res.end(cachedRender);
+				} else if (typeof cachedRender == 'object') {
+					res.writeHead(cachedRender.status || 200, {
+						"Content-Type": "text/html"
+					});
+					return res.end(cachedRender.body || '');
+				}
 			}
-		}
 
-		prerender.getPrerenderedPageResponse(req, function (err, prerenderedResponse) {
-			prerender.afterRenderFn(err, req, prerenderedResponse);
+			prerender.getPrerenderedPageResponse(req, function (err, prerenderedResponse) {
+				prerender.afterRenderFn(err, req, prerenderedResponse);
 
-			if (prerenderedResponse) {
-				res.writeHead(prerenderedResponse.statusCode, prerenderedResponse.headers);
-				return res.end(prerenderedResponse.body);
-			} else {
-				console.log("prerender error", err);
-				next();
-			}
+				if (prerenderedResponse) {
+					res.writeHead(prerenderedResponse.statusCode, prerenderedResponse.headers);
+					return res.end(prerenderedResponse.body);
+				} else {
+					console.log("prerender error", err);
+					next();
+				}
+			});
 		});
-	});
+	} catch (err) {
+		console.log("prerender try / catch error", err);
+		next();
+	}
 };
 
 prerender.crawlerUserAgents = [

@@ -3,7 +3,7 @@ var url = require('url');
 var zlib = require('zlib');
 
 function isValidRemoteIp(ipAddress) {
-	const IP_REGEX = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+	const IP_REGEX = /^.*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 	return IP_REGEX.test(ipAddress);
 }
 
@@ -196,11 +196,18 @@ prerender.getPrerenderedPageResponse = function (req, callback) {
 	let xForwardedClientIp = req.headers['x-forwarded-for'];
 
 	if (xForwardedClientIp) {
-		xForwardedClientIp = req.headers['x-forwarded-for'].split(',')[0]; // x-forwarded-for: client, proxy1, proxy2, proxy3 - we want the original client
+		xForwardedClientIp = req.headers['x-forwarded-for'].split(',')[0]; 	 // x-forwarded-for: client, proxy1, proxy2, proxy3 - we want the original client
 	}
-	
+
 	const cloudflareIp = req.headers['cf-connecting-ip'];
 	const originalIp = req.query.gl || cloudflareIp || xForwardedClientIp || req.connection.remoteAddress; // store original ip
+
+	console.log("req.query.gl", req.query.gl);
+	console.log("cloudflareIp", cloudflareIp);
+	console.log("xForwardedClientIp", xForwardedClientIp);
+	console.log("req.connection.remoteAddress", req.connection.remoteAddress);
+
+	console.log(originalIp)
 
 	if (originalIp && isValidRemoteIp(originalIp)) {
 		// console.log("Injecting originalIp header =", originalIp);

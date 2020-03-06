@@ -200,12 +200,18 @@ prerender.getPrerenderedPageResponse = function (req, callback) {
 	}
 
 	const cloudflareIp = req.headers['cf-connecting-ip'];
-	const originalIp = req.query.gl || cloudflareIp || xForwardedClientIp || req.connection.remoteAddress; // store original ip
+	let originalIp = req.query.gl || cloudflareIp || xForwardedClientIp || req.connection.remoteAddress; // store original ip
 
 	console.log("req.query.gl", req.query.gl);
 	console.log("cloudflareIp", cloudflareIp);
 	console.log("xForwardedClientIp", xForwardedClientIp);
 	console.log("req.connection.remoteAddress", req.connection.remoteAddress);
+
+	console.log(originalIp)
+
+	if (originalIp) {
+		originalIp = String(originalIp).replace("::ffff:", "");
+	}
 
 	console.log(originalIp)
 

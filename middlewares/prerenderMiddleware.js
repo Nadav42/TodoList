@@ -193,7 +193,12 @@ prerender.getPrerenderedPageResponse = function (req, callback) {
 	}
 
 	// save original request ip
-	const xForwardedClientIp = (req.headers['x-forwarded-for'] || '').split(',')[0]; // x-forwarded-for: client, proxy1, proxy2, proxy3 - we want the original client
+	let xForwardedClientIp = req.headers['x-forwarded-for'];
+
+	if (xForwardedClientIp) {
+		xForwardedClientIp = req.headers['x-forwarded-for'].split(',')[0]; // x-forwarded-for: client, proxy1, proxy2, proxy3 - we want the original client
+	}
+	
 	const cloudflareIp = req.headers['cf-connecting-ip'];
 	const originalIp = req.query.gl || cloudflareIp || xForwardedClientIp || req.connection.remoteAddress; // store original ip
 
